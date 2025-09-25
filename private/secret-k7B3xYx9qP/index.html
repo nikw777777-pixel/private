@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Family Gallery</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <style>
+    body {
+      font-family: "Segoe UI", system-ui, sans-serif;
+      margin: 0;
+      background: linear-gradient(135deg, #f8f1e7, #e9f3fa);
+      color: #333;
+      text-align: center;
+    }
+    header {
+      padding: 40px 20px;
+      background: #ffffffdd;
+      backdrop-filter: blur(6px);
+      border-bottom: 2px solid #ddd;
+    }
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      color: #444;
+    }
+    .muted { color: #666; font-size: 14px; }
+    .hidden { display: none; }
+    .gate {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin-top: 16px;
+    }
+    input, button {
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid #bbb;
+      background: #fff;
+      color: #333;
+      font-size: 14px;
+    }
+    button { cursor: pointer; background: #5a8dee; color: white; border: none; }
+    button:hover { background: #4875c6; }
+
+    /* Slideshow */
+    #slideshow { margin-top: 20px; }
+    #slide {
+      max-width: 90%;
+      max-height: 85vh;
+      border-radius: 16px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+      opacity: 0;
+      transition: opacity 2s ease;
+    }
+    #slide.show { opacity: 1; }
+
+    /* Music button */
+    #musicBtn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #5a8dee;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      font-size: 20px;
+    }
+    #musicBtn:hover { background: #4875c6; }
+  </style>
+</head>
+<body>
+  <header id="header">
+    <h1>Family Gallery</h1>
+    <div class="muted">For our family only ❤️</div>
+    <div id="gate" class="gate">
+      <input id="code" type="password" placeholder="Access code" />
+      <button id="enter">Enter</button>
+      <span id="msg" class="muted"></span>
+    </div>
+  </header>
+
+  <main>
+    <div id="slideshow" class="hidden">
+      <img id="slide" src="" alt="slideshow image" />
+    </div>
+  </main>
+
+  <!-- Background music -->
+  <audio id="bgmusic" loop autoplay>
+    <source src="../IMAGE_FILES/aduio.mp3" type="audio/mpeg">
+  </audio>
+  <button id="musicBtn">🔊</button>
+
+  <script>
+    // --- SETTINGS ---
+    const ACCESS_CODE = "دوستت دارم"; // change password here
+    const IMAGE_FILES = [
+      "A.jpeg","A1.jpeg","A2.jpeg","A3.jpeg","A4.jpeg","A5.jpeg","A6.jpeg",
+      "B.jpeg","C.jpeg","D.jpeg","E.jpeg","F.jpeg","G.jpeg","H.jpeg","I.jpeg",
+      "J.jpeg","K.jpeg","L.jpeg","M.jpeg","O.jpeg","P.jpeg","Q.jpeg","R.jpeg",
+      "S.jpeg","X.jpeg","Y.jpeg"
+    ];
+    const IMAGE_BASE = "../IMAGE_FILES/";
+    const DELAY = 5000; // 5 seconds per image
+    // ----------------
+
+    let index = 0;
+    let timer = null;
+
+    const headerEl = document.getElementById("header");
+    const msgEl = document.getElementById("msg");
+    const slideEl = document.getElementById("slide");
+    const slideshowEl = document.getElementById("slideshow");
+    const music = document.getElementById("bgmusic");
+    const musicBtn = document.getElementById("musicBtn");
+
+    document.getElementById("enter").addEventListener("click", () => {
+      const val = document.getElementById("code").value;
+      if (val === ACCESS_CODE) {
+        // hide everything except slideshow
+        headerEl.classList.add("hidden");
+        slideshowEl.classList.remove("hidden");
+
+        // start slideshow
+        startSlideshow();
+
+        // try to force music play unmuted
+        music.muted = false;
+        music.play().catch(err => {
+          console.log("Autoplay blocked, user must click speaker:", err);
+        });
+      } else {
+        msgEl.textContent = "Wrong code";
+      }
+    });
+
+    function startSlideshow() {
+      function showNext() {
+        slideEl.classList.remove("show"); // fade out
+        setTimeout(() => {
+          slideEl.src = IMAGE_BASE + IMAGE_FILES[index];
+          slideEl.classList.add("show"); // fade in
+          index = (index + 1) % IMAGE_FILES.length;
+        }, 1000);
+      }
+      showNext();
+      timer = setInterval(showNext, DELAY);
+    }
+
+    // Music toggle
+    musicBtn.addEventListener("click", () => {
+      if (music.muted) {
+        music.muted = false;
+        music.play();
+        musicBtn.textContent = "🔊";
+      } else {
+        music.muted = true;
+        musicBtn.textContent = "🔇";
+      }
+    });
+  </script>
+</body>
+</html>
